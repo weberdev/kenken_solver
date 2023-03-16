@@ -35,19 +35,22 @@ def main():
     cageList = []
     puzzleArray = [[cell() for j in range(puzzleSize)] for i in range(puzzleSize)]
     for m,line in enumerate(range(1, puzzleSize)):
-        rowArray = line.split(',')
+        #COMMENT BELOW IS TO REMIND ME OF THE SYNTAX IN THE PUZZLE
+        #r1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5
+        rowArray = input[line].split(',')
+        #each cell is split on commas
         for i, token in enumerate(rowArray):
-            #r1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5
             tokenvals = token.split('.')
+            #we split on periods, turn the value into a list.
             cellCage = tokenvals[0]
-            cellCageNumber = cellCage[1:]
+            cellCageNumber = cellCage[1:].int()
             if (tokenvals[1]):
                 if (tokenvals[1][-1].isdigit() == False):
-                    cageTotal = tokenvals[1][:-1]
+                    cageTotal = tokenvals[1][:-1].int()
                     cageOperator = tokenvals[1][-1]
                 else:
-                    cageTotal = tokenvals[1]
-                    cageOperator = tokenvals[1]
+                    cageTotal = tokenvals[1].int()
+                    cageOperator = tokenvals[1].int()
                 newCage = cage(cellCageNumber, cageTotal, cageOperator)
                 cageList.append(newCage)
             puzzleArray[m][i] = cell(cellCageNumber)
