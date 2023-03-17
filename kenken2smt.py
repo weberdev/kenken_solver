@@ -97,7 +97,7 @@ def not_main_right_now():
 
 #this is to be renamed test later
 def main():
-    input = "#kenken www.kenkenpuzzle.com Puzzle 73491 9x9 Medium\nr1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5\nr1,r6.4/,r6,r7.3-,r8.45*,r8,r9.22+,r9,r5\nr1,r10.3+,r10,r7,r11.2-,r11,r9,r12.2-,r12\nr13.3/,r14.1-,r15.8-,r16.120*,r16,r16,r17.20*,r18.2-,r19.2\nr13,r14,r15,r20.2-,r20,r17,r17,r18,r21.17+\nr22.9+,r23.63*,r24.1-,r25.5-,r24,r26.1-,r27.48*,r21,r21\nr22,r23,r24,r28.5-,r28,r26,r27,r29.4/,r29\nr30.3,r31.432*,r32.20+,r32,r33.18+,r34.3+,r34,r35.13+,r36.2-\nr31,r31,r32,r32,r33,r33,r33,r34,r3"
+    input = "#kenken www.kenkenpuzzle.com Puzzle 73491 9x9 Medium\nr1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5\nr1,r6.4/,r6,r7.3-,r8.45*,r8,r9.22+,r9,r5\nr1,r10.3+,r10,r7,r11.2-,r11,r9,r12.2-,r12\nr13.3/,r14.1-,r15.8-,r16.120*,r16,r16,r17.20*,r18.2-,r19.2\nr13,r14,r15,r20.2-,r20,r17,r17,r18,r21.17+\nr22.9+,r23.63*,r24.1-,r25.5-,r24,r26.1-,r27.48*,r21,r21\nr22,r23,r24,r28.5-,r28,r26,r27,r29.4/,r29\nr30.3,r31.432*,r32.20+,r32,r33.18+,r34.3+,r34,r35.13+,r36.2-\nr31,r31,r32,r32,r33,r33,r33,r35,r36"
     testInputList = input.split('\n')
     lazySizeList = testInputList[0].split(' ')
     #this is extremely ugly, but it should work to grab the size of the puzzle.
@@ -164,13 +164,13 @@ def main():
             for position in currCage.cellPositions:
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize-1))+col
+                singleValuePosition = (row*(puzzleSize))+col
                 outputString += f"V{singleValuePosition} "
             outputString += f")) (= {currCage.total} ({currCage.operator} "
             for position in currCage.cellPositions:
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize-1))+col
+                singleValuePosition = (row*(puzzleSize))+col
                 outputString += f"V{singleValuePosition} "
             outputString += f"))));Cage{currCage.number} \n"
         else:
@@ -178,7 +178,7 @@ def main():
             for position in currCage.cellPositions:
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize-1))+col
+                singleValuePosition = (row*(puzzleSize))+col
                 outputString += f"V{singleValuePosition} ))) ; Cage{currCage.number} \n"
     print(outputString)
 if __name__ == "__main__":
