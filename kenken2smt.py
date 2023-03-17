@@ -32,34 +32,34 @@ class cell:
         self.row = row
         self.column = col
 
-def not_main_right_now():
+def main():
     input = [line for line in stdin]
     lazySizeList = input[0].split(' ')
     #this is extremely ugly, but it should work to grab the size of the puzzle.
     puzzleSize = getPuzzleSize(lazySizeList)
+    del input[0]
     numberSet = makeNumberSet(puzzleSize)
     cageList = []
-    puzzleArray = [[cell() for j in range(puzzleSize)] for i in range(puzzleSize)]
- 
+    puzzleArray = [[0 for j in range(puzzleSize)] for i in range(puzzleSize)]
     puzzleSize = getPuzzleSize(lazySizeList)
-
     outputString = "(set-logic UFNIA)\n"
     outputString +="(set-option :produce-models true)\n"
     outputString +="(set-option :produce-assignments true)\n"
-    for i in range(0,(puzzleSize^2)):
+    numberOfCells = puzzleSize*puzzleSize
+    for i in range(numberOfCells):
         outputString += f"(declare-const V{i} Int)\n"
-
-# check uniqueness of rows
-        row_vars = [f"V[{r*puzzleSize + c}]" for c in range(puzzleSize)]
+        outputString += f"(assert (and (> V{i} 0) (< V{i} {puzzleSize+1})))\n"
+    # check uniqueness of rows
     for r in range(puzzleSize):
+        row_vars = [f"V[{r*puzzleSize + c}]" for c in range(puzzleSize)]
         outputString += f"(assert (distinct {' '.join(row_vars)}))\n"
 
-# check uniqueness of columns
+    # check uniqueness of columns
     for c in range(puzzleSize):
         col_vars = [f"V[{r*puzzleSize + c}]" for r in range(puzzleSize)]
         outputString += f"(assert (distinct {' '.join(col_vars)}))\n"
 
-    for m,line in enumerate(range(1, puzzleSize+1)):
+    for m,line in enumerate(range(puzzleSize)):
         #COMMENT BELOW IS TO REMIND ME OF THE SYNTAX IN THE PUZZLE
         #r1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5
         rowArray = input[line].split(',')
@@ -68,35 +68,58 @@ def not_main_right_now():
             tokenvals = token.split('.')
             #we split on periods, turn the value into a list.
             cellCage = tokenvals[0]
-            cellCageNumberf = cellCage[1:].int()
-            if (tokenvals[1]):
+            cellCageNumber = int(cellCage[1:])
+            if (len(tokenvals)>1):
                 if (tokenvals[1][-1].isdigit() == False):
-                    cageTotal = tokenvals[1][:-1].int()
+                    cageTotal = int(tokenvals[1][:-1])
                     cageOperator = tokenvals[1][-1]
                 else:
-                    cageTotal = tokenvals[1].int()
-                    cageOperator = tokenvals[1].int()
+                    cageTotal = int(tokenvals[1])
+                    cageOperator = int(tokenvals[1])
                 newCage = cage(cellCageNumber, cageTotal, cageOperator)
+                newCage.cellPositions.append((m, i))
                 cageList.append(newCage)
-            puzzleArray[m][i] = cell(cellCageNumber)
-    #CURRENT STATUS:
-            #at this point, we will have an array with the l
+            else:
+                cageList[cellCageNumber-1].cellPositions.append((m,i))
 
-    #populate the cellPositions lists of the cage objects
-    for m, line in enumerate(range(1, puzzleSize+1)):
-        for i, cell in enumerate(range(1, puzzleSize+1)):
-            currCell = rowArray[m][i]
-            cageList[(currCell.cage)+1].cellPositions.append[m,i]
     #CURRENT STATUS:
         #at this point, we have populated the cellPositions lists of the cage objects
     
     #populate the equality constraints
     for m, currCage in enumerate(cageList):
-        if isdigit(currCage.operator):
-            currCage.cellPositions[0].acceptableNumbers.update([currCage.operator.int()])
+        if currCage.operator in ("*", "+"):
+            outputString += f"(assert (= {currCage.total} ({currCage.operator} "
+            for position in currCage.cellPositions:
+                row = position[0]
+                col = position[1]
+                singleValuePosition = (row*(puzzleSize))+col
+                outputString += f"V{singleValuePosition} "
+            outputString +=f"))) ; Cage {currCage.number} \n"
+        elif currCage.operator in ("/", "-"):
+            outputString += f"(assert (or (= {currCage.total} ({currCage.operator} "
+            for position in currCage.cellPositions:
+                row = position[0]
+                col = position[1]
+                singleValuePosition = row*(puzzleSize)+col
+                outputString += f"V{singleValuePosition} "
+            outputString += f")) (= {currCage.total} ({currCage.operator} "
+            for position in reversed(currCage.cellPositions):
+                row = position[0]
+                col = position[1]
+                singleValuePosition = row*(puzzleSize)+col
+                outputString += f"V{singleValuePosition} "
+            outputString += f")))) ; Cage{currCage.number} \n"
+        else:
+            outputString += f"(assert (= {currCage.total}( "
+            for position in currCage.cellPositions:
+                row = position[0]
+                col = position[1]
+                singleValuePosition = row*(puzzleSize)+col
+                outputString += f"V{singleValuePosition} ))) ; Cage {currCage.number} \n"
+    print(outputString)
 
-#this is to be renamed test later
-def main():
+
+def test():
     input = "#kenken www.kenkenpuzzle.com Puzzle 73491 9x9 Medium\nr1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5\nr1,r6.4/,r6,r7.3-,r8.45*,r8,r9.22+,r9,r5\nr1,r10.3+,r10,r7,r11.2-,r11,r9,r12.2-,r12\nr13.3/,r14.1-,r15.8-,r16.120*,r16,r16,r17.20*,r18.2-,r19.2\nr13,r14,r15,r20.2-,r20,r17,r17,r18,r21.17+\nr22.9+,r23.63*,r24.1-,r25.5-,r24,r26.1-,r27.48*,r21,r21\nr22,r23,r24,r28.5-,r28,r26,r27,r29.4/,r29\nr30.3,r31.432*,r32.20+,r32,r33.18+,r34.3+,r34,r35.13+,r36.2-\nr31,r31,r32,r32,r33,r33,r33,r35,r36"
     testInputList = input.split('\n')
     lazySizeList = testInputList[0].split(' ')
@@ -110,15 +133,16 @@ def main():
     outputString = "(set-logic UFNIA)\n"
     outputString +="(set-option :produce-models true)\n"
     outputString +="(set-option :produce-assignments true)\n"
-    for i in range(0,(puzzleSize^2)):
+    numberOfCells = puzzleSize*puzzleSize
+    for i in range(numberOfCells):
         outputString += f"(declare-const V{i} Int)\n"
-
-# check uniqueness of rows
+        outputString += f"(assert (and (> V{i} 0) (< V{i} {puzzleSize+1})))\n"
+    # check uniqueness of rows
     for r in range(puzzleSize):
         row_vars = [f"V[{r*puzzleSize + c}]" for c in range(puzzleSize)]
         outputString += f"(assert (distinct {' '.join(row_vars)}))\n"
 
-# check uniqueness of columns
+    # check uniqueness of columns
     for c in range(puzzleSize):
         col_vars = [f"V[{r*puzzleSize + c}]" for r in range(puzzleSize)]
         outputString += f"(assert (distinct {' '.join(col_vars)}))\n"
@@ -156,30 +180,31 @@ def main():
             for position in currCage.cellPositions:
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize-1))+col
+                singleValuePosition = (row*(puzzleSize))+col
                 outputString += f"V{singleValuePosition} "
-            outputString +=f"))) ;Cage{currCage.number} \n"
+            outputString +=f"))) ; Cage {currCage.number} \n"
         elif currCage.operator in ("/", "-"):
             outputString += f"(assert (or (= {currCage.total} ({currCage.operator} "
             for position in currCage.cellPositions:
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize))+col
+                singleValuePosition = row*(puzzleSize)+col
                 outputString += f"V{singleValuePosition} "
             outputString += f")) (= {currCage.total} ({currCage.operator} "
-            for position in currCage.cellPositions:
+            for position in reversed(currCage.cellPositions):
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize))+col
+                singleValuePosition = row*(puzzleSize)+col
                 outputString += f"V{singleValuePosition} "
-            outputString += f"))));Cage{currCage.number} \n"
+            outputString += f")))) ; Cage{currCage.number} \n"
         else:
             outputString += f"(assert (= {currCage.total}( "
             for position in currCage.cellPositions:
                 row = position[0]
                 col = position[1]
-                singleValuePosition = (row*(puzzleSize))+col
-                outputString += f"V{singleValuePosition} ))) ; Cage{currCage.number} \n"
+                singleValuePosition = row*(puzzleSize)+col
+                outputString += f"V{singleValuePosition} ))) ; Cage {currCage.number} \n"
     print(outputString)
+
 if __name__ == "__main__":
     main()
