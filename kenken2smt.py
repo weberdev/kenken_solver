@@ -129,7 +129,7 @@ def main():
 
 
 def genFromInput(input):
-    lazySizeList = input.split("\n")[0]
+    lazySizeList = input.split("\n")[1]
 
     puzzleSize = getPuzzleSize(lazySizeList)
 
@@ -167,7 +167,7 @@ def genFromInput(input):
         Tuple[str, List[Expr]],
     ] = {}
     iter = count(0)
-    for line in input.split("\n"):
+    for line in input.split("\n")[1:]:
         for cell in line.split(","):
             if "." in cell:
                 cellAndConstraint = cell.split(".")
