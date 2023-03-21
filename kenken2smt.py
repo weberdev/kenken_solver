@@ -207,6 +207,11 @@ def genFromInput(input):
             )
 
     expressions.append(Expr(f"(check-sat)"))
+    expressions.append(
+        Expr(f"(get-value ({expandToArgs([V(c) for c in range(numberOfCells)])}))")
+    )
+    expressions.append(Expr(f"(exit)"))
+    range(numberOfCells)
     outputString = "\n".join(map(str, expressions))
     outputString += "\n"
     print(outputString)
