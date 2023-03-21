@@ -188,16 +188,14 @@ def genFromInput(input):
         equalTo = constraint[0:-1]
         op = constraint[-1]
         elements = v[1]
-        print(op)
         if op.isdigit() and len(elements) == 1:
             expressions.append(Assert(Expr(op) == Expr(*elements)))
         elif op == "-" or op == "/":
             expressions.append(
                 Assert(
-                    Expr(equalTo)
-                    == Or(
+                    Or(
                         *[
-                            Expr(f"({op} {expandToArgs([*perm])})")
+                            Expr(equalTo) == Expr(f"({op} {expandToArgs([*perm])})")
                             for perm in permutations(elements)
                         ]
                     )
@@ -208,7 +206,7 @@ def genFromInput(input):
                 (Assert(Expr(equalTo) == Expr(f"({op} {expandToArgs(elements)})")))
             )
 
-    print(cages)
+    expressions.append(Expr(f"(check-sat)"))
     outputString = "\n".join(map(str, expressions))
     outputString += "\n"
     print(outputString)
