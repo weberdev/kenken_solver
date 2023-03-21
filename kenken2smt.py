@@ -29,7 +29,7 @@ def makeNumberSet(puzzleSize):
 
 
 def getPuzzleSize(firstLine):
-    return len(firstLine[:].split(","))
+    return len(firstLine.split("\n")[1].split(","))
 
 
 class cell:
@@ -129,9 +129,7 @@ def main():
 
 
 def genFromInput(input):
-    lazySizeList = input.split("\n")[1]
-
-    puzzleSize = getPuzzleSize(lazySizeList)
+    puzzleSize = getPuzzleSize(input)
 
     numberOfCells = puzzleSize * puzzleSize
 
