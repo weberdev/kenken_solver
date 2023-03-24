@@ -92,14 +92,27 @@ def createKenKen(puzzleString):
     )
 
 
-def main():
-    # Ensure we got a puzzle passed to us
-    if len(sys.argv) != 2:
-        print("ERROR: expected a single command argument containing a Puzzle ID")
-        print("For example")
-        print("pp '22597'")
+def getPuzzleId():
+    try:
+        # Ensure we got a puzzle passed to us
+        if len(sys.argv) == 2:
+            if sys.argv[1] == "-h" or (not sys.argv[1].isdigit()):
+                print("pp: expects a single command argument containing a Puzzle ID")
+                print("For example")
+                print("pp '22597'")
+                exit(0)
+            return sys.argv[1]
+        else:
+            puzzledesc = [line for line in sys.stdin][0].split()
+            return puzzledesc[(puzzledesc.index("Puzzle") + 1)]
 
-    puzzle = sys.argv[1]
+    except:
+        print("ERROR: Failed to identify PUZZLE ID")
+        exit(1)
+
+
+def main():
+    puzzle: str = getPuzzleId()
 
     # Run the provided script from the professor
     p = run(
