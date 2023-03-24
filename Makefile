@@ -27,6 +27,7 @@ test: smt2kenken kenken2smt
 # Test the pretty printer
 testpp: pp
 	diff <(./pp 22597) <(./pp < hard-puz.txt)
+	./pp 22597
 
 # Usage examples for the pretty printer
 examplepp: pp
