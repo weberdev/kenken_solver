@@ -2,32 +2,23 @@
 from subprocess import run, PIPE
 from functools import reduce
 from itertools import takewhile, dropwhile
-from typing import Union
+from typing import Union, TypeVar
 import json
 import sys
 
-
-class bcolors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKCYAN = "\033[96m"
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[95m"
-    UNDERLINE = "\033[4m"
-
-
+# Coloring used at the commandline to make the grid visable
 COLOR_ON = "\033[95m"
 COLOR_OFF = "\033[0m"
 
+# Ensure we got a puzzle passed to us
 if len(sys.argv) != 2:
     print("ERROR: expected a single command argument containing a Puzzle ID")
     print("For example")
     print("pp '22597'")
 
 puzzle = sys.argv[1]
+
+# Run the provided script from the professor
 p = run(
     ["bash", "./fetch.sh", puzzle],
     stdout=PIPE,
@@ -36,11 +27,12 @@ p = run(
 if p.returncode != 0:
     print("Error script did not execute properly")
     exit(1)
-
 info = json.loads(p.stdout.replace("\\r\\n", "\\n").replace("\\r", "\\n"))["data"]
 
 
 def collectSection(puzzleInfo, startChar: str, endChar: Union[None, str] = None):
+    """Takes the puzzleInfo string and splits it from one heading to
+    another"""
     start = dropwhile(lambda c: c != startChar, puzzleInfo)
     return "".join(
         [
@@ -50,21 +42,9 @@ def collectSection(puzzleInfo, startChar: str, endChar: Union[None, str] = None)
     ).strip()
 
 
-vertical = collectSection(info, "V", "H")
-# had to transpose
-horazontal = list(
-    list(x)
-    for x in zip(
-        *map(
-            lambda line: [cell for cell in line.split()],
-            [line for line in collectSection(info, "H").split("\n")],
-        )
-    )
-)
-print(vertical)
-print()
-print("\n".join(map(lambda a: " ".join(a), horazontal)))
-print()
+def transpose(l):
+    "Transposes a list. Used for the horizontal matrix"
+    return list(list(x) for x in zip(*l))
 
 
 class Cell:
@@ -90,11 +70,19 @@ class Cell:
         return f"{self.target}{self.operator if (self.operator != '1') else ' '}"
 
 
-# pretty print answer
-# pretty print target
 target = collectSection(info, "T", "S")
 symbols = collectSection(info, "S", "V")
 answer = collectSection(info, "A", "T")
+vertical = collectSection(info, "V", "H")
+
+# had to transpose
+horazontal = transpose(
+    map(
+        lambda line: [cell for cell in line.split()],
+        [line for line in collectSection(info, "H").split("\n")],
+    )
+)
+
 targetRows = list(
     map(
         lambda a, b, c, d, e: list(map(Cell, a, b, c, d, e)),
@@ -116,22 +104,7 @@ largestConstraint = reduce(
 )
 
 
-def getHSeperator(c: Cell):
-    return COLOR_ON + "|" if c.horazontal else COLOR_OFF + "|"
-
-
-# print(target)
 columnWidth = largestConstraint + 2
-# Start of grid
-print(vertical)
-print(targetRows)
-print(
-    COLOR_ON
-    + "|"
-    + "+".join(["=" * columnWidth for _ in (enumerate(targetRows[0]))])
-    + "|"
-    + COLOR_OFF
-)
 
 
 def whiteSpaceFor(string: str) -> str:
@@ -140,9 +113,23 @@ def whiteSpaceFor(string: str) -> str:
 
 BOLDBAR = COLOR_ON + "|"
 BOLDEQ = COLOR_ON + "="
+
+
+def topOrBottomLine(colwid):
+    # Start of grid
+    print(
+        COLOR_ON
+        + "|"
+        + "+".join(["=" * columnWidth for _ in (enumerate(targetRows[0]))])
+        + "|"
+        + COLOR_OFF
+    )
+
+
+topOrBottomLine(columnWidth)
 for i, row in enumerate(targetRows):
     # Row with the target and symbol printed
-    if i >= 1:
+    if i >= 1:  # We have a dedicated print for just the first grid line alreadyg
         print(
             BOLDBAR
             + "+".join(
@@ -218,4 +205,4 @@ for i, row in enumerate(targetRows):
     )
 
 # Finally the ending row of =, +, and | all colored since it's the outer edge
-print(BOLDBAR + "+".join([BOLDEQ * columnWidth for _ in targetRows[-1]]) + BOLDBAR)
+topOrBottomLine(columnWidth)
