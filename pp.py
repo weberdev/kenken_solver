@@ -111,21 +111,28 @@ def getPuzzleId():
         exit(1)
 
 
+def lookupPuzzle(id):
+    try:
+        # Run the provided script from the professor
+        p = run(
+            ["bash", "./fetch.sh", id],
+            stdout=PIPE,
+            encoding="ascii",
+        )
+        if p.returncode != 0:
+            print("Error script did not execute properly")
+            exit(1)
+        return json.loads(p.stdout.replace("\\r\\n", "\\n").replace("\\r", "\\n"))[
+            "data"
+        ]
+    except:
+        print("Failed to find a puzzle with the ID" + id)
+
+
 def main():
     puzzle: str = getPuzzleId()
 
-    # Run the provided script from the professor
-    p = run(
-        ["bash", "./fetch.sh", puzzle],
-        stdout=PIPE,
-        encoding="ascii",
-    )
-    if p.returncode != 0:
-        print("Error script did not execute properly")
-        exit(1)
-    info = json.loads(p.stdout.replace("\\r\\n", "\\n").replace("\\r", "\\n"))["data"]
-
-    kenkenPuzzle = createKenKen(info)
+    kenkenPuzzle = createKenKen(lookupPuzzle(puzzle))
 
     largestConstraint = reduce(
         lambda a, b: max(
@@ -180,7 +187,7 @@ def main():
                     + (
                         cell.constraint() + whiteSpaceFor(cell.constraint())
                         if cell.target
-                        else " " * columnWidth
+                        else whiteSpaceFor("")
                     )
                     + (COLOR_ON if cell.vertical else "")
                     for cell in row
