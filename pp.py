@@ -104,6 +104,7 @@ def getPuzzleId():
             return sys.argv[1]
         else:
             puzzledesc = [line for line in sys.stdin][0].split()
+            # Get the puzzle id following the text Puzzle
             return puzzledesc[(puzzledesc.index("Puzzle") + 1)]
 
     except:
