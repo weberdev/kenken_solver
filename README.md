@@ -32,7 +32,7 @@ For examples of how to run this project look at the make targets for
   ./kenken2smt < hard-puz.txt | mathsat | ./smt2kenken > sol.txt
   ```
   Replace `hard-puz.txt` with your puzzle input of choice
-    
+
 - pp.py
   - Source code for the pretty print it takes a puzzle ID as an
     argument. If no ID is provided it will accept a puzzle on
@@ -55,6 +55,13 @@ For examples of how to run this project look at the make targets for
   ```bash
   ./pp < hard-puz.txt
   ```
+- fetch.sh
+  - Used for fetching the puzzle information based on a Puzzle ID in
+    `pp`
+- hard-puz.txt
+  - Example puzzle input for testing `pp`, `smt2kenken`, and `kenken2smt`
+- hard-sol.txt
+  - Example puzzle solution for testing `smt2kenken` and `kenken2smt`
 
 - Makefile
   - Makefile used to convert the python files into executable without
