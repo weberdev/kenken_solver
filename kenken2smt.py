@@ -28,8 +28,8 @@ def makeNumberSet(puzzleSize):
     return numberSet
 
 
-def getPuzzleSize(firstLine):
-    return len(firstLine.split("\n")[1].split(","))
+def getPuzzleSize(pz: str):
+    return len(pz.split("\n")[1].split(","))
 
 
 class cell:
@@ -124,7 +124,10 @@ Int = Expr("Int")
 
 
 def main():
-    input = "".join([line for line in stdin]).strip()
+    input = "".join(
+        # Strip out any comments
+        filter(lambda l: not l.startswith("#"), [line for line in stdin])
+    ).strip()
     genFromInput(input)
 
 
@@ -165,7 +168,7 @@ def genFromInput(input):
         Tuple[str, List[Expr]],
     ] = {}
     iter = count(0)
-    for line in input.split("\n")[1:]:
+    for line in input.split("\n"):
         for cell in line.split(","):
             if "." in cell:
                 cellAndConstraint = cell.split(".")
@@ -213,11 +216,6 @@ def genFromInput(input):
     outputString = "\n".join(map(str, expressions))
     outputString += "\n"
     print(outputString)
-
-
-def test():
-    input = "#kenken www.kenkenpuzzle.com Puzzle 73491 9x9 Medium\nr1.16+,r2.1-,r2,r3.5-,r3,r4.3/,r4,r5.13+,r5\nr1,r6.4/,r6,r7.3-,r8.45*,r8,r9.22+,r9,r5\nr1,r10.3+,r10,r7,r11.2-,r11,r9,r12.2-,r12\nr13.3/,r14.1-,r15.8-,r16.120*,r16,r16,r17.20*,r18.2-,r19.2\nr13,r14,r15,r20.2-,r20,r17,r17,r18,r21.17+\nr22.9+,r23.63*,r24.1-,r25.5-,r24,r26.1-,r27.48*,r21,r21\nr22,r23,r24,r28.5-,r28,r26,r27,r29.4/,r29\nr30.3,r31.432*,r32.20+,r32,r33.18+,r34.3+,r34,r35.13+,r36.2-\nr31,r31,r32,r32,r33,r33,r33,r35,r36"
-    genFromInput(input)
 
 
 if __name__ == "__main__":
