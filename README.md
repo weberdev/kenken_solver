@@ -3,15 +3,36 @@
 - Ajiri Ogedegbe (V00882351)
 - Ian Weber (V0092478)
 
-# Files In This Repo
-- smt2kenken.py
-  - source code for converting the solutions produced by mathsat into
-    a string of numbers to be inserted into the kenken puzzle
+# Building This Project
+To build this project simply run `make` or `make target`
 
+This will just rename all the python files to better comply with the
+project specification. e.g. `kenken2smt.py` -> `kenken2smt`
+
+For examples of how to run this project look at the make targets for
+`make test` and `make testpp`
+
+# Files In This Repo
 - kenken2smt.py
   - Source code for converting the text encoded kenken puzzle from
     `STDIN` into smt input for mathsat and printing it to `STDOUT`
+  - To execute this simply pass a kenken puzzle as input:
+  ```bash
+  ./kenken2smt < hard-puz.txt
+  ```
+  Replace `hard-puz.txt` with your puzzle input of choice
+  - This output can then be piped to `mathsat`
 
+- smt2kenken.py
+  - source code for converting the solutions produced by mathsat into
+    a string of numbers to be inserted into the kenken puzzle
+  - This is intended to be used with `mathsat` and `kenken2smt`.
+	To use this program ensure you have mathsat installed and run
+  ```bash
+  ./kenken2smt < hard-puz.txt | mathsat | ./smt2kenken > sol.txt
+  ```
+  Replace `hard-puz.txt` with your puzzle input of choice
+    
 - pp.py
   - Source code for the pretty print it takes a puzzle ID as an
     argument. If no ID is provided it will accept a puzzle on
@@ -39,9 +60,3 @@
   - Makefile used to convert the python files into executable without
     the .py prefix
   - Also contains additional scripts for running tests
-
-# Building This Project
-To build this project simply run `make` or `make target`
-
-For examples of how to run this project look at the make targets for
-`make test`
