@@ -55,6 +55,9 @@ For examples of how to run this project look at the make targets for
   ```bash
   ./pp < hard-puz.txt
   ```
+  - **NOTE**: To make the cages for each of the boxes colours are used so please
+    ensure your terminal supports colour output.
+
 - fetch.sh
   - Used for fetching the puzzle information based on a Puzzle ID in
     `pp`
